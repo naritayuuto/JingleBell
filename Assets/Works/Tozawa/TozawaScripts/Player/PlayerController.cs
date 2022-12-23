@@ -14,11 +14,11 @@ public class PlayerController : MonoBehaviour
     float _v = default;
     [SerializeField, Header("プレイヤーの移動速度調整用値"), Range(1, 100)]
     float _speed = 10;
-    [SerializeField]Rigidbody2D _rb;
+    [SerializeField]
+    Rigidbody2D _rb;
     Vector2 _ps;
     ReactiveProperty<bool> _isPushed = new ReactiveProperty<bool>();
 
-    public IReadOnlyReactiveProperty<bool> IsPushed => _isPushed;
     public Vector2 Ps { get => _ps;}
 
     void Start()
@@ -28,7 +28,11 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         _v = Input.GetAxisRaw("Vertical");
-        _isPushed.Value = Input.GetButtonDown("Jump");
+
+        if (Input.GetButtonDown("Jump"))
+        {
+            GameManager.InstanceGM._uiManager.Fan();
+        }
     }
     void FixedUpdate()
     {
@@ -49,10 +53,5 @@ public class PlayerController : MonoBehaviour
         {
             item.ItemAction();
         }
-    }
-
-    void OnDisable()
-    {
-        _isPushed.Dispose();
     }
 }

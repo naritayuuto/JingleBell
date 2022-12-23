@@ -12,20 +12,20 @@ public class PlayerPresenter : MonoBehaviour
     [SerializeField, Tooltip("View•”•ª")]
     UiManager _uiManager;
     // Start is called before the first frame update
-    void Start()
-    {
-        Player();
-    }
+    //void Start()
+    //{
+    //    Player();
+    //}
 
-    void Player()
-    {
-        _playerController.IsPushed
-            .Subscribe(x =>
-            {
-                if(x && GameManager.InstanceGM.FanValue.Value >= _uiManager.FanSliderValueMax)
-                {
-                    _uiManager.Fan();
-                }
-            });
-    }
+    //void Player()
+    //{
+    //    _playerController.IsPushed
+    //        .Subscribe(x =>
+    //        {
+    //            if(x && GameManager.InstanceGM.FanValue.Value >= _uiManager.FanSliderValueMax)
+    //            {
+    //                _uiManager.Fan();
+    //            }
+    //        });
+    //}
 }
