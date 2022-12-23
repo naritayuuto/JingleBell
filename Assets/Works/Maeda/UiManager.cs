@@ -8,83 +8,74 @@ using Unity.VisualScripting;
 
 public class UiManager : MonoBehaviour
 {
-    [SerializeField, Header("リザルトの結果を表示する")]
-    ResultChange _resultChange;
-
     [SerializeField, Header("リザルトのキャンバス")]
     Canvas _resultCanvas;
-
     [SerializeField, Header("スコアを表示するテキスト")]
     Text _scoreText;
-
     [SerializeField, Header("ゲームの制限時間を表示するテキスト")]
     Text _timeText;
-
-    [SerializeField, Header("タバコのイメージ画像")]
+    [SerializeField, Header("煙のイメージ画像")]
     Image _smongImage;
-
-    [SerializeField, Header("扇ゲージのスライダー")]
-    Slider _fanGaugeSlider;
-
-    [SerializeField, Header("フィーバーゲージのスライダー")]
-    Slider _fevarGaugeSlider;
-
+    [SerializeField,Header("表示するスコア")]
+    float _score = 0f;
+    [SerializeField, Header("扇ゲージの値")]
+    int _fanScore = 0;
+    [SerializeField, Header("はゲージの値")]
+    float _hagageScore = 0f;
+    [SerializeField, Header("煙が出る時間")]
+    float _smokeTime = 10f;
     [SerializeField, Header("スコアの変化にかける時間")]
     float _changeValueInterval;
-
-    [SerializeField, Header("扇ゲージの変化にかける時間")]
-    float _changeFanGaugeInterval;
-
-    [SerializeField, Header("フィーバーゲージの変化にかける時間")]
-    float _changeFevarGaugeInterval;
-
     [SerializeField, Header("ゲームの制限時間")]
-    float _gameTime;
-
+    float _gameTime = 60f;
     [SerializeField, Header("煙草を表示する時間")]
-    float _smongTime;
-
+    float _smongTime = 5f;
     [SerializeField, Header("フィーバーを表示する時間")]
-    float _fevarTime;
-
-    ReactiveProperty<GameState> _changeState = new ReactiveProperty<GameState>();
-
+    float _fevarTime = 10f;
+    bool isSmoke = false;
     //扇ゲージの最大
-    const float _fanSliderValueMax = 120;
-
+    const int _fanSliderValueMax = 3;
     //フィーバーゲージの最大
-    const float _fevarSliderValueMax = 100;
-
+    const int _fevarSliderValueMax = 100;
+    [SerializeField]
+    Animator _hagageAnim;
     //ゲーム時間の計測用
     float _timer;
-
-    //画像を表示する時間
+    //煙を表示している時間
     float _eventInterval;
-
+    //フィーバーしている時間
+    float _fevarTimer;
     //画像表示の計測用
     float _eventTimer = 0;
-
     //煙草の煙のアニメーション
     Animator _smongAni;
-
     public float FanSliderValueMax => _fanSliderValueMax;
-    public IReadOnlyReactiveProperty<GameState> ChangeState => _changeState;
 
     private void Awake()
     {
-        _fevarGaugeSlider.maxValue = _fevarSliderValueMax;
-        _fanGaugeSlider.maxValue = _fanSliderValueMax;
-
-        _timer = _gameTime;
-        _timeText.text = _timer.ToString("00");
+        //時間を表示
+        _timeText.text = _gameTime.ToString("00");
 
         _smongAni = _smongImage.gameObject.GetComponent<Animator>();
 
         _resultCanvas.enabled = false;
 
-        StartCoroutine(GameTime());
+        GameManager.InstanceGM.UIManagerSet(this);
     }
 
+    private void Update()
+    {
+        _gameTime -= Time.deltaTime;
+        _timeText.text = _gameTime.ToString("00");
+        if(isSmoke)
+        {
+            SmokeAppearance();
+        }
+        if (GameManager.InstanceGM.State == GameState.Fevar)
+        {
+            IndicateFevar();
+        }
+    }
     /// <summary>
     /// スコアをDotweenで動的に表示する
     /// </summary>
@@ -98,131 +89,83 @@ public class UiManager : MonoBehaviour
             _changeValueInterval)
             .OnUpdate(() => _scoreText.text = sliderValue.ToString("000"));
     }
-
     /// <summary>
-    /// 扇ゲージをDotweenで動的に表示する
+    /// フィーバー時の処理
     /// </summary>
-    public void FanGaugeInterpolation(float gaugeValue)
+    void IndicateFevar()
     {
-        if (gaugeValue > _fanSliderValueMax) { gaugeValue = _fanSliderValueMax; }
-        else if (gaugeValue == _fanSliderValueMax) { return; }
-
-        DOTween.To(() => _fanGaugeSlider.value, // 連続的に変化させる対象の値
-            x => _fanGaugeSlider.value = x, // 変化させた値 x をどう処理するかを書く
-            gaugeValue, // x をどの値まで変化させるか指示する
-            _changeFanGaugeInterval);
-    }
-
-    /// <summary>
-    /// フィーバーゲージをDotweenで動的に表示する
-    /// </summary>
-    public void FevarGaugeInterpolation(float gaugeValue)
-    {
-        if (_changeState.Value != GameState.Fevar)
+        _fevarTimer += Time.deltaTime;
+        if(_fevarTimer >= _fevarTime)
         {
-            if (gaugeValue > _fevarSliderValueMax) { gaugeValue = _fevarSliderValueMax; }
-            
-            DOTween.To(() => _fevarGaugeSlider.value, // 連続的に変化させる対象の値
-                x => _fevarGaugeSlider.value = x, // 変化させた値 x をどう処理するかを書く
-                gaugeValue, // x をどの値まで変化させるか指示する
-                _changeFevarGaugeInterval).OnComplete(() => IndicateFevar());
+            GameManager.InstanceGM.State = GameState.PlayGame;
+            _fevarTimer = 0;
+            _hagageScore = 0;
+            _hagageAnim.SetFloat("hagageScore", _hagageScore);
         }
     }
 
-    /// <summary>
-    /// 煙草の演出を表示する
-    /// </summary>
-    public void IndicateSmoke()
+    void SmokeAppearance()
     {
-        if (_changeState.Value != GameState.Fevar && _changeState.Value != GameState.Finish) 
+        _eventInterval += Time.deltaTime;
+        if (_eventInterval < _smongTime)
         {
-            if (_eventTimer == 0)
-            {
-                _eventInterval = _smongTime;
-                StartCoroutine(EventTime()); 
-            }
-
-            _eventInterval = _smongTime;
-            _eventTimer = 0;
-            _smongAni.SetBool("isSmoke", true);
+            _smongAni.SetBool("isSmoke", isSmoke);
+        }
+        else
+        {
+            isSmoke = false;
+            _smongAni.SetBool("isSmoke", isSmoke);
         }
     }
-
-    /// <summary>
-    /// フィーバーの演出を表示する
-    /// </summary>
-    public void IndicateFevar()
+    public void Fan()//Itemの効果
     {
-        if (_fevarGaugeSlider.value == _fevarSliderValueMax)
+        if (_fanScore >= _fanSliderValueMax)
         {
-            if (_eventTimer == 0) 
-            {
-                _eventInterval = _fevarTime;
-                StartCoroutine(EventTime()); 
-            }
-
-            _eventInterval = _fevarTime;
-            _eventTimer = 0;
-
             if (_smongImage.enabled)
             {
-                _smongAni.SetBool("isSmoke" , false);
+                isSmoke = false;
+                _smongAni.SetBool("isSmoke", isSmoke);
+                _fanScore = 0;
             }
+        }
+    }
+    /// <summary>
+    /// 煙草の接触を検知したときに呼ぶ
+    /// </summary>
+    public void AddCigarettes()
+    {
+        if (!isSmoke)
+            isSmoke = true;
+        else
+            _eventInterval = 0;
+    }
 
-            _changeState.Value = GameState.Fevar; 
+    /// <summary>引数をスコアに加算する</summary>
+    public void AddScore(float scoreValue)
+    {
+        _score += scoreValue;
+        ScoreInterpolation(_score);
+    }
+
+    /// <summary>引数を扇のカウントに加算</summary>
+    public void AddFanValue(int fanVlue)
+    {
+        if(_fanScore < _fanSliderValueMax)
+        {
+            _fanScore += fanVlue;
         }
     }
 
-    public void Fan() 
+    /// <summary>引数をフィーバー</summary>
+    public void AddFevarValue(float fevarValue)
     {
-        if (_smongImage.enabled)
+        if (GameManager.InstanceGM.State != GameState.Fevar || _hagageScore > _fevarSliderValueMax)
         {
-            FanGaugeInterpolation(0);
-
-            _smongAni.Play("SmokeEnd");
-        }
-    }
-
-    private IEnumerator GameTime() 
-    {
-        while(_changeState.Value != GameState.Finish && _timer > 0) 
-        {
-            yield return new WaitForSeconds(1);
-
-            _timer--;
-            _timeText.text = _timer.ToString("00");
-        }
-
-        if (_timer <= 0) 
-        {
-            _changeState.Value = GameState.Finish;
-            _timer = 0;
-            _eventTimer = 0;
-            _resultCanvas.enabled = true;
-            _resultChange.Result(int.Parse(_scoreText.text));
-        }
-    }
-
-    private IEnumerator EventTime()
-    {
-        while (_changeState.Value != GameState.Finish && _eventInterval > _eventTimer)
-        {
-            yield return new WaitForEndOfFrame();
-
-            _eventTimer += Time.deltaTime;
-        }
-
-        if (_eventInterval < _eventTimer) 
-        {
-            _eventTimer = 0;
-
-            if (_smongImage.enabled)
+            _hagageScore += fevarValue;
+            _hagageAnim.SetFloat("hagageScore", _hagageScore);//アニメーション内でイラストを変更。
+            if(_hagageScore >= _fevarSliderValueMax)
             {
-                _smongAni.SetBool("isSmoke", false);
-            }
-            else 
-            {
-                _changeState.Value = GameState.PlayGame;
+                GameManager.InstanceGM.State = GameState.Fevar;
             }
         }
     }
