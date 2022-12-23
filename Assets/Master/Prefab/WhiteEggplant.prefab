@@ -124,6 +124,7 @@ MonoBehaviour:
   _itemType: 1
   _score: 3
   _feverScore: 2
+  UiManager: {fileID: 8330024238526806229, guid: 083e6492778738d4cb267979aaf621d5, type: 3}
 --- !u!58 &2271141707766807662
 CircleCollider2D:
   m_ObjectHideFlags: 0

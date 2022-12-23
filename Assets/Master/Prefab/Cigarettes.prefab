@@ -122,6 +122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _probability: 25
   _itemType: 3
+  UiManager: {fileID: 8330024238526806229, guid: 083e6492778738d4cb267979aaf621d5, type: 3}
 --- !u!58 &5129931131997295821
 CircleCollider2D:
   m_ObjectHideFlags: 0
