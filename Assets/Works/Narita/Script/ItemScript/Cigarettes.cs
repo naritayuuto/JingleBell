@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class Cigarettes : ItemBase
 {
-    int _touchCount = 1;
     public override void ItemAction()
     {
-        GameManager.InstanceGM.AddCigarettes(_touchCount);
+        GameManager.InstanceGM._uiManager.AddCigarettes();
         Destroy(gameObject);
         //GameManagerの関数を呼ぶ。
     }
