@@ -8,6 +8,11 @@ public class SoundManager : MonoBehaviour
     SoundScriptable _soundDataBase = null;
     [Tooltip("現在再生しているBGM")]
     GameObject _loopingBGM = null;
+
+    private void Awake()
+    {
+        GameManager.InstanceGM.SoundManagerSet(this);
+    }
     /// <summary>
     /// _soundDataBaseのプロパティ
     /// </summary>

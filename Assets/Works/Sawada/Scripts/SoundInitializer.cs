@@ -11,11 +11,11 @@ public class SoundInitializer : MonoBehaviour
 
     private void Awake()
     {
-        //if (GameManager.InstanceSM.SoundDataBase == null)
-        //{
-        //    GameManager.InstanceSM.SoundDataBase = _soundScriptableObj;
-        //}
-        //GameManager.InstanceSM.CallSound(SoundType.BGM, soundNum);
+        if (GameManager.InstanceSM.SoundDataBase == null)
+        {
+            GameManager.InstanceSM.SoundDataBase = _soundScriptableObj;
+        }
+        GameManager.InstanceSM.CallSound(SoundType.BGM, soundNum);
         Destroy(gameObject);
     }
 }

@@ -19,6 +19,8 @@ public class GameManager
 
     public GameState State { get => _gameState; set => _gameState = value; }
 
+    public static SoundManager InstanceSM => _instanceSM;
+
     public static GameManager InstanceGM
     {
         get
@@ -33,6 +35,11 @@ public class GameManager
     public void UIManagerSet(UiManager ui)
     {
         _uiManager = ui;
+    }
+
+    public void SoundManagerSet(SoundManager sound)
+    {
+        _instanceSM = sound;
     }
     public void ChangeState(GameState gameState)
     {
