@@ -32,13 +32,6 @@ public abstract class ItemBase : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.TryGetComponent<PlayerController>(out var player))
-        {
-            GameManager.InstanceSM.CallSound(SoundType.SE, 1);
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        Destroy(gameObject);
+        GameManager.InstanceSM.CallSound(SoundType.SE, 1);
     }
 }
