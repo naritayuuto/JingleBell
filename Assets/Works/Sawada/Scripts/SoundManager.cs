@@ -65,9 +65,13 @@ public class SoundManager : MonoBehaviour
         _loopingBGM = soundPlayer;
 
         //ループしない場合、指定した秒数後に削除
-        if(!sound.IsLoop)
+        if (sound.IsLoop)
         {
-            Destroy(audioSource, _soundDataBase.WaitDestorySecond);
+            _loopingBGM = soundPlayer;
+        }
+        else
+        {
+            Destroy(soundPlayer, _soundDataBase.WaitDestorySecond);
         }
     }
 }
