@@ -9,7 +9,7 @@ using Unity.VisualScripting;
 public class UiManager : MonoBehaviour
 {
     [SerializeField, Header("リザルトのキャンバス")]
-    Canvas _resultCanvas;
+    GameObject _resultCanvas;
     [SerializeField, Header("スコアを表示するテキスト")]
     Text _scoreText;
     [SerializeField, Header("ゲームの制限時間を表示するテキスト")]
@@ -33,6 +33,7 @@ public class UiManager : MonoBehaviour
     [SerializeField, Header("フィーバーを表示する時間")]
     float _fevarTime = 10f;
     bool isSmoke = false;
+    bool _scoreCheck = false;
     //扇ゲージの最大
     const int _fanSliderValueMax = 3;
     //フィーバーゲージの最大
@@ -58,7 +59,7 @@ public class UiManager : MonoBehaviour
 
         _smongAni = _smongImage.gameObject.GetComponent<Animator>();
 
-        _resultCanvas.enabled = false;
+        _resultCanvas.SetActive(false);
 
         GameManager.InstanceGM.UIManagerSet(this);
     }
@@ -66,8 +67,20 @@ public class UiManager : MonoBehaviour
     private void Update()
     {
         _gameTime -= Time.deltaTime;
-        _timeText.text = _gameTime.ToString("00");
-        if(isSmoke)
+        if (_gameTime >= 0)
+        {
+            _timeText.text = _gameTime.ToString("00");
+        }
+        else
+        {
+            if (!_scoreCheck)
+            {
+                //フェードアウトしてからが望ましい
+                _resultCanvas.GetComponent<ResultChange>().Result((int)_score);
+                _scoreCheck = true;
+            }
+        }
+        if (isSmoke)
         {
             SmokeAppearance();
         }
