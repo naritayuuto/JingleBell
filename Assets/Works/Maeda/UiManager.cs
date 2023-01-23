@@ -38,7 +38,7 @@ public class UiManager : MonoBehaviour
     const int _fanSliderValueMax = 3;
     //フィーバーゲージの最大
     const int _fevarSliderValueMax = 100;
-    [SerializeField]
+    [SerializeField,Header("はゲージのanimator")]
     Animator _hagageAnim;
     //ゲーム時間の計測用
     float _timer;
@@ -49,7 +49,7 @@ public class UiManager : MonoBehaviour
     //画像表示の計測用
     float _eventTimer = 0;
     //煙草の煙のアニメーション
-    Animator _smongAni;
+    Animator _smongAnim;
     public float FanSliderValueMax => _fanSliderValueMax;
 
     private void Awake()
@@ -57,7 +57,7 @@ public class UiManager : MonoBehaviour
         //時間を表示
         _timeText.text = _gameTime.ToString("00");
 
-        _smongAni = _smongImage.gameObject.GetComponent<Animator>();
+        _smongAnim = _smongImage.gameObject.GetComponent<Animator>();
 
         _resultCanvas.SetActive(false);
 
@@ -76,6 +76,7 @@ public class UiManager : MonoBehaviour
             if (!_scoreCheck)
             {
                 //フェードアウトしてからが望ましい
+                _resultCanvas.SetActive(true);
                 _resultCanvas.GetComponent<ResultChange>().Result((int)_score);
                 _scoreCheck = true;
             }
@@ -122,12 +123,12 @@ public class UiManager : MonoBehaviour
         _eventInterval += Time.deltaTime;
         if (_eventInterval < _smongTime)
         {
-            _smongAni.SetBool("isSmoke", isSmoke);
+            _smongAnim.SetBool("isSmoke", isSmoke);
         }
         else
         {
             isSmoke = false;
-            _smongAni.SetBool("isSmoke", isSmoke);
+            _smongAnim.SetBool("isSmoke", isSmoke);
         }
     }
     public void Fan()//Itemの効果
@@ -137,7 +138,7 @@ public class UiManager : MonoBehaviour
             if (_smongImage.enabled)
             {
                 isSmoke = false;
-                _smongAni.SetBool("isSmoke", isSmoke);
+                _smongAnim.SetBool("isSmoke", isSmoke);
                 _fanScore = 0;
             }
         }
@@ -179,6 +180,7 @@ public class UiManager : MonoBehaviour
             if(_hagageScore >= _fevarSliderValueMax)
             {
                 GameManager.InstanceGM.State = GameState.Fevar;
+                GameManager.InstanceGM.ChangeState(GameManager.InstanceGM.State);
             }
         }
     }

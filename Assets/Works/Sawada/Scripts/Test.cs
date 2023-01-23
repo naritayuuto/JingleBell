@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    public static SoundManager _instance = new SoundManager();
+   // public static SoundManager _instance = new SoundManager();
     // Start is called before the first frame update
     void Start()
     {
-        _instance.CallSound(SoundType.BGM, 0);
+        //_instance.CallSound(SoundType.BGM, 0);
     }
 }

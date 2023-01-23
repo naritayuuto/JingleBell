@@ -11,9 +11,8 @@ public class ResultChange : MonoBehaviour
     Sprite _normalImage = null;
     [SerializeField]
     Sprite _happyImage = null;
-    Image _panelImage = null;
     [SerializeField]
-    GameObject _panel = null;
+    Image _panelImage = null;
     [SerializeField]
     TextMeshProUGUI _scoreText = null;
     [SerializeField]
@@ -23,10 +22,10 @@ public class ResultChange : MonoBehaviour
     [SerializeField]
     int _happyScore = 0;
 
-    private void Start()
-    {
-        _panelImage = _panel.GetComponent<Image>();
-    }
+    //private void Start()
+    //{
+    //    _panelImage = _panel.GetComponent<Image>();
+    //}
     // Update is called once per frame
     public void Result(int score)
     {
