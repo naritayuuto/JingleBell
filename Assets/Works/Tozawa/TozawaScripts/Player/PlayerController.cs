@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour
         if(collision.TryGetComponent<ItemBase>(out var item))
         {
             item.ItemAction();
-            GameManager.InstanceMM.PlaySE(SE.Item);
+            //GameManager.InstanceMM.PlaySE(SE.Item);
         }
     }
 }

@@ -10,7 +10,7 @@ public class GameManager
 {
     static GameManager _instanceGM = new GameManager();
 
-    //static SoundManager _instanceSM = new SoundManager();
+    static SoundManager _instanceSM = new SoundManager();
 
     static MusicManager _instanceMM;
 
@@ -21,7 +21,7 @@ public class GameManager
 
     public GameState State { get => _gameState; set => _gameState = value; }
 
-    //public static SoundManager InstanceSM => _instanceSM;
+    public static SoundManager InstanceSM => _instanceSM;
     public static MusicManager InstanceMM => _instanceMM;
 
     public static GameManager InstanceGM
@@ -58,11 +58,13 @@ public class GameManager
                 break;
 
             case GameState.PlayGame:
-                _instanceMM.PlayBGM(BGM.GamePlay);
+                _instanceSM.CallSound(SoundType.BGM, 0);
+                //_instanceMM.PlayBGM(BGM.GamePlay);
                 break;
 
             case GameState.Fevar:
-                _instanceMM.PlayBGM(BGM.FeverTime);
+                _instanceSM.CallSound(SoundType.BGM, 3);
+                //_instanceMM.PlayBGM(BGM.FeverTime);
                 break;
 
             case GameState.Finish:

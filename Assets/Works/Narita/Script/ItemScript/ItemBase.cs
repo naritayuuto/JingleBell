@@ -30,8 +30,9 @@ public abstract class ItemBase : MonoBehaviour
     }
     public abstract void ItemAction();
 
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    GameManager.InstanceMM.PlaySE(SE.Item);
-    //}
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //GameManager.InstanceMM.PlaySE(SE.Item);
+        GameManager.InstanceSM.CallSound(SoundType.SE, 1);
+    }
 }
